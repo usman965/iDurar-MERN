@@ -20,8 +20,31 @@ const app = express();
 
 app.use(
   cors({
-    origin: true,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      // Allow localhost for development
+      if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        return callback(null, true);
+      }
+      
+      // Allow your Railway domain
+      if (origin.includes('railway.app')) {
+        return callback(null, true);
+      }
+      
+      // Allow your production domain if you have one
+      if (origin.includes('idurarapp.com')) {
+        return callback(null, true);
+      }
+      
+      // Allow all origins for now (you can restrict this later)
+      return callback(null, true);
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-auth-token'],
   })
 );
 
